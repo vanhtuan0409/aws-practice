@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  api:
+    image: vanhtuan/simple-server
+    container_name: "server"
+    build: .
+    ports:
+      - 8080:8080
