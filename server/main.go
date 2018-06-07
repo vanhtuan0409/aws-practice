@@ -44,7 +44,7 @@ func main() {
 	machineIP := getOutboundIP().String()
 
 	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		log.Panicln("Received 1 request")
+		log.Println("Received 1 request")
 		if os.Getenv("ENABLE_HIGH_LOAD") != "" {
 			stop := make(chan bool)
 			highLoadSimulate(stop)
