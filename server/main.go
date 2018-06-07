@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"runtime"
 	"time"
 )
@@ -43,14 +44,20 @@ func main() {
 	machineIP := getOutboundIP().String()
 
 	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		stop := make(chan bool)
-		numOfCore := highLoadSimulate(stop)
-		time.Sleep(time.Second * 2)
-		close(stop)
+		if os.Getenv("ENABLE_HIGH_LOAD") != "" {
+			stop := make(chan bool)
+			highLoadSimulate(stop)
+			time.Sleep(time.Second * 2)
+			close(stop)
+		}
 
 		rw.WriteHeader(http.StatusOK)
-		msg := fmt.Sprintf("Hello from %s. Running %d core of cpu", machineIP, numOfCore)
+		msg := fmt.Sprintf("Hello from %s", machineIP)
 		rw.Write([]byte(msg))
+	})
+	http.HandleFunc("/health", func(rw http.ResponseWriter, r *http.Request) {
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte("OK"))
 	})
 	log.Println("Server is starting at port :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
